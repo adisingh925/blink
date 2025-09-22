@@ -25,7 +25,12 @@ class MyServerCallbacks : public BLEServerCallbacks
   void onDisconnect(BLEServer *pServer)
   {
     Serial.println("BLE Device disconnected");
-    BLE_security = false; /** Reset security on disconnect **/
+    BLE_security = false;
+
+    // Restart advertising manually
+    BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+    pAdvertising->start();
+    Serial.println("Restarted advertising...");
   }
 };
 
@@ -44,9 +49,8 @@ public:
     else
     {
       BLE_security = false;
-      Serial.println("Authentication failed! Disconnecting...");
-      if (pServer)
-        pServer->disconnect(pServer->getConnId());
+      Serial.println("Authentication failed!");
+      /** Don't force disconnect, just reset security flag **/
     }
   }
 
